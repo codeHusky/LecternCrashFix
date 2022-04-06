@@ -135,7 +135,11 @@ public class WrapperPlayClientWindowClick extends AbstractPacket {
     }
 
     public InventoryClickType getShift() {
-        return handle.getEnumModifier(InventoryClickType.class, 4).read(0);
+        try {
+            return handle.getEnumModifier(InventoryClickType.class, 4).read(0);
+        }catch (Exception e){
+            return handle.getEnumModifier(InventoryClickType.class, 5).read(0);
+        }
     }
 
     public void setShift(InventoryClickType value) {

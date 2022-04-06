@@ -6,19 +6,34 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import lol.hyper.lecterncrashfix.wrapper.WrapperPlayClientWindowClick;
+import me.lucko.helper.Schedulers;
+import me.lucko.helper.plugin.ExtendedJavaPlugin;
+import me.lucko.helper.plugin.ap.Plugin;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import java.util.logging.Logger;
 
-public final class LecternCrashFix extends JavaPlugin {
+@Plugin(name = "LecternCrashFix", apiVersion = "1.13", hardDepends = {"ProtocolLib"}, version = "1.0")
+public final class LecternCrashFix extends ExtendedJavaPlugin {
 
     private final Logger logger = this.getLogger();
+    public static LecternCrashFix INSTANCE = null;
 
     @Override
-    public void onEnable() {
+    protected void enable() {
+
+        INSTANCE = this;
+        try{
+            InventoryType.valueOf("LECTERN");
+        }catch (IllegalArgumentException e){
+            logger.severe("LecternCrashFix will not load due to InventoryType.LECTERN not being present!");
+            return;
+        }
         ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(this, ListenerPriority.HIGHEST, PacketType.Play.Client.WINDOW_CLICK) {
             @Override
             public void onPacketReceiving(PacketEvent event) {
@@ -37,5 +52,10 @@ public final class LecternCrashFix extends JavaPlugin {
                 }
             }
         });
+    }
+
+    @Override
+    protected void disable() {
+        ProtocolLibrary.getProtocolManager().removePacketListeners(this);
     }
 }
